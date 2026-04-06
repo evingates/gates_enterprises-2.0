@@ -14,7 +14,7 @@ const applicationRoutes = require('./src/routes/applicationRoutes');
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173' }));
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000' }));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
