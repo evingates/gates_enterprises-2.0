@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
           window.location.href = '/jobs.html';
         }
       } else {
-        errorMsg.innerText = data.message || 'Registration failed';
+        errorMsg.innerText = data.errors ? data.errors.join(', ') : (data.message || 'Registration failed');
         errorMsg.style.display = 'block';
       }
     } catch (err) {

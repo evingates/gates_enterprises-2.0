@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 require('express-async-errors'); // patches express route handlers to catch async errors automatically
 const express = require('express');
 const cors = require('cors');
@@ -25,6 +26,18 @@ app.use('/api/applications', applicationRoutes);
 
 app.use(errorMiddleware);
 
+
+
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '../client')));
+
+// Any unknown frontend route gets redirected or defaults to jobs page
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, '../client/jobs.html'));
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

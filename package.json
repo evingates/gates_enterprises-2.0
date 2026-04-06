@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
-    "install-all": "npm install && npm install --prefix server && npm install --prefix client"
+    "start": "node server/server.js",
+    "dev": "npm run dev --prefix server",
+    "install-all": "npm install && npm install --prefix server && npm install --prefix client",
+    "db:migrate": "node run_migrations.js"
   },
   "repository": {
     "type": "git",
