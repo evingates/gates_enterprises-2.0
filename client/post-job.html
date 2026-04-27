@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post a Job - Gates Enterprises</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .page-header {
+      background-color: var(--dark-navy);
+      padding: 32px 0;
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    .form-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 40px;
+      max-width: 780px;
+      margin: 0 auto 60px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 24px;
+    }
+
+    .form-grid .input-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .input-field, select.input-field, textarea.input-field {
+      width: 100%;
+      background: #fff;
+      color: var(--text-dark);
+    }
+
+    textarea.input-field {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      min-height: 36px;
+    }
+
+    .skill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--badge-blue-bg);
+      color: var(--primary-blue);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .skill-tag button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--primary-blue);
+      font-size: 14px;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .skills-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .skills-input-row .input-field {
+      flex: 1;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border-color);
+      margin: 28px 0;
+    }
+
+    .section-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 20px;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    .alert-error { background: #FEE2E2; color: #B91C1C; }
+    .alert-success { background: #D1FAE5; color: #065F46; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="/jobs.html" class="logo">
+        <span class="logo-icon">✦</span> Gates Enterprises
+      </a>
+      <div class="nav-links">
+        <a href="/jobs.html">View Board</a>
+        <a href="/dashboard-employer.html">Dashboard</a>
+      </div>
+      <div class="nav-auth">
+        <button id="logoutBtn" class="btn btn-outline" style="padding: 6px 12px;">Log Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="page-header">
+    <div class="container">
+      <h1 class="hero-headline" style="font-size: 28px; margin-bottom: 8px;">Post a New Job</h1>
+      <p style="color: #94A3B8;">Fill in the details below to publish your opening.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="form-card">
+      <div id="alertBox" class="alert"></div>
+
+      <form id="postJobForm" novalidate>
+
+        <!-- Basic Info -->
+        <p class="section-label">Basic Information</p>
+        <div class="form-grid">
+          <div class="input-group full">
+            <label class="input-label" for="job_title">Job Title <span style="color:#E11D48">*</span></label>
+            <input type="text" id="job_title" class="input-field" placeholder="e.g. Senior Frontend Developer" required>
+          </div>
+
+          <div class="input-group full">
+            <label class="input-label" for="description">Job Description <span style="color:#E11D48">*</span></label>
+            <textarea id="description" class="input-field" placeholder="Describe the role, responsibilities, and what you're looking for..."></textarea>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="location">Location</label>
+            <input type="text" id="location" class="input-field" placeholder="e.g. Nairobi or Remote">
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="experience_level_needed">Experience Level</label>
+            <select id="experience_level_needed" class="input-field">
+              <option value="">Select level...</option>
+              <option value="Entry">Entry Level</option>
+              <option value="Mid">Mid Level</option>
+              <option value="Senior">Senior Level</option>
+            </select>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Salary -->
+        <p class="section-label">Compensation</p>
+        <div class="form-grid">
+          <div class="input-group">
+            <label class="input-label" for="salary_min">Minimum Salary (USD/yr)</label>
+            <input type="number" id="salary_min" class="input-field" placeholder="e.g. 50000" min="0">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="salary_max">Maximum Salary (USD/yr)</label>
+            <input type="number" id="salary_max" class="input-field" placeholder="e.g. 90000" min="0">
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Skills & Extra -->
+        <p class="section-label">Skills & Details</p>
+        <div class="form-grid">
+          <div class="input-group full">
+            <label class="input-label">Required Skills</label>
+            <div class="skills-input-row">
+              <input type="text" id="skillInput" class="input-field" placeholder="Type a skill and press Add or Enter">
+              <button type="button" id="addSkillBtn" class="btn btn-outline">Add</button>
+            </div>
+            <div id="skillsContainer" class="skills-container"></div>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="application_method">Application Method</label>
+            <input type="text" id="application_method" class="input-field" placeholder="e.g. Email or Apply via platform">
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="deadline_date">Application Deadline</label>
+            <input type="date" id="deadline_date" class="input-field">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <a href="/dashboard-employer.html" class="btn btn-outline">Cancel</a>
+          <button type="submit" id="submitBtn" class="btn btn-primary">Post Job</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/post-job.js"></script>
+</body>
+</html>

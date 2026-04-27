@@ -4,6 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
   setupNavbarAuth();
   setupFilters();
   fetchJobs();
+
+  // Persistent event delegation for Apply buttons
+  document.getElementById('jobsGrid').addEventListener('click', function (e) {
+    const btn = e.target.closest('.apply-btn');
+    if (btn) {
+      applyForJob(btn.dataset.jobId); // Keep as UUID string — do NOT parseInt
+    }
+  });
 });
 
 function setupNavbarAuth() {
@@ -14,9 +22,13 @@ function setupNavbarAuth() {
     authSection.innerHTML = `
       <div style="display: flex; gap: 16px; align-items: center;">
         <a href="${dashLink}" style="color: var(--text-dark); font-weight: 500; text-decoration: none;">Dashboard</a>
-        <button onclick="logout()" class="btn btn-outline" style="padding: 6px 12px; font-size: 13px;">Log Out</button>
+        <button id="logoutBtn" class="btn btn-outline" style="padding: 6px 12px; font-size: 13px;">Log Out</button>
       </div>
     `;
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      clearAuth();
+      window.location.href = '/login.html';
+    });
   } else {
     authSection.innerHTML = `
       <div style="display: flex; gap: 16px; align-items: center;">
@@ -103,39 +115,53 @@ function renderJobs(jobs) {
         
         <div class="card-footer">
           <span class="job-salary">${salaryText}</span>
-          <button class="btn btn-primary" onclick="applyForJob(${job.job_id})" style="padding: 8px 16px;">Apply</button>
+          <button class="btn btn-primary apply-btn" data-job-id="${job.job_id}" style="padding: 8px 16px;">Apply</button>
         </div>
       </div>
     `;
   }).join('');
+
+
 }
 
-function applyForJob(jobId) {
+async function applyForJob(jobId) {
+  console.log('[Apply] Job ID being sent:', jobId, '| type:', typeof jobId);
+
   if (!isAuthenticated()) {
     window.location.href = '/login.html';
     return;
   }
-  
+
   const user = getUser();
   if (user && user.role === 'employer') {
-    alert("Employers cannot apply for jobs.");
+    alert('Employers cannot apply for jobs.');
     return;
   }
-  
-  // Fake apply request for now
-  apiFetch('/applications', {
-    method: 'POST',
-    body: JSON.stringify({ job_id: jobId })
-  }).then(res => res.json()).then(data => {
+
+  try {
+    const res = await apiFetch('/applications', {
+      method: 'POST',
+      body: JSON.stringify({ job_id: jobId })
+    });
+
+    if (!res) return; // 401 handled by apiFetch (redirects to login)
+
+    const data = await res.json();
+    console.log('[Apply] Server response:', data);
+
     if (data.success) {
-      alert("Successfully applied for the job!");
+      alert('Successfully applied for the job!');
     } else {
-      alert(data.message || "Could not apply. You might have applied already.");
+      // Show actual server error — Joi validation errors come in data.errors array
+      const errMsg = data.message
+        || (data.errors && data.errors.join('\n'))
+        || 'Could not apply. Please try again.';
+      alert(errMsg);
     }
-  }).catch(e => {
-    console.error(e);
-    alert("Application error.");
-  });
+  } catch (e) {
+    console.error('[Apply] Error:', e);
+    alert('A network error occurred while applying.');
+  }
 }
 
 function setupFilters() {

@@ -3,8 +3,20 @@ const applicationQueries = require('../queries/applicationQueries');
 
 const applyToJob = async (req, res) => {
   const { job_id } = req.body;
-  const result = await db.query(applicationQueries.INSERT_APPLICATION, [req.user.user_id, job_id]);
-  res.status(201).json({ success: true, application: result.rows[0] });
+  const jobIdInt = parseInt(job_id, 10);
+  if (isNaN(jobIdInt)) {
+    return res.status(400).json({ success: false, message: 'Invalid job ID.' });
+  }
+  try {
+    const result = await db.query(applicationQueries.INSERT_APPLICATION, [req.user.user_id, jobIdInt]);
+    res.status(201).json({ success: true, application: result.rows[0] });
+  } catch (err) {
+    // Unique constraint violation: user already applied
+    if (err.code === '23505') {
+      return res.status(409).json({ success: false, message: 'You have already applied for this job.' });
+    }
+    throw err; // let express-async-errors handle the rest
+  }
 };
 
 const getSeekerApplications = async (req, res) => {

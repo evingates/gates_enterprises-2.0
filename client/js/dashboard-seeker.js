@@ -38,11 +38,11 @@ function renderApplications(apps) {
   
   tbody.innerHTML = apps.map(app => {
     let statusClass = 'status-applied';
-    if (app.status === 'Interviewing') statusClass = 'status-interviewing';
-    if (app.status === 'Offered') statusClass = 'status-offered';
-    if (app.status === 'Rejected') statusClass = 'status-rejected';
+    if (app.application_status === 'Interviewing') statusClass = 'status-interviewing';
+    if (app.application_status === 'Offered') statusClass = 'status-offered';
+    if (app.application_status === 'Rejected') statusClass = 'status-rejected';
     
-    const date = new Date(app.applied_at).toLocaleDateString('en-US', {
+    const date = new Date(app.created_at).toLocaleDateString('en-US', {
       year: 'numeric', month: 'short', day: 'numeric'
     });
     
@@ -51,7 +51,7 @@ function renderApplications(apps) {
         <td style="font-weight: 600;">${app.job_title}</td>
         <td>${app.company_name}</td>
         <td class="text-muted">${date}</td>
-        <td><span class="status-badge ${statusClass}">${app.status || 'Applied'}</span></td>
+        <td><span class="status-badge ${statusClass}">${app.application_status || 'pending'}</span></td>
       </tr>
     `;
   }).join('');

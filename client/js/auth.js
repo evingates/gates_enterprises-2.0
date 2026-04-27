@@ -33,7 +33,7 @@ function requireGuest() {
   }
 }
 
-function logout() {
+window.logout = function() {
   clearAuth();
   window.location.href = '/login.html';
-}
+};

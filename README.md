@@ -65,7 +65,7 @@ Ensure PostgreSQL is installed on your machine.
 Create `.env` files based on the structure below:
 **`server/.env`**
 ```env
-DATABASE_URL=postgresql://postgres:CLIMATESMART@localhost:5432/gates_db
+DATABASE_URL=postgresql://postgres:hazardkid10@localhost:5432/gates_db
 JWT_SECRET=a_super_secret_key_123
 PORT=5000
 ```
@@ -81,7 +81,7 @@ npm run dev
 ```
 
 - **Frontend**: Accessible at `http://localhost:5173`
-- **Backend**: API accessible at `http://localhost:5000` (auto-proxied via Vite!)
+- **Backend**: API accessible at `http://localhost:5000' (auto-proxied via Vite!)
 
 ---
 

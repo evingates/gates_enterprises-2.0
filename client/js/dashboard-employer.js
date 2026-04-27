@@ -86,26 +86,36 @@ async function fetchApplicants(jobId) {
     if (!response) return;
     
     const data = await response.json();
+    console.log('[Applicants] Server response:', data, '| Status:', response.status);
+
     if (data.success && data.applications.length > 0) {
       renderApplicants(data.applications, jobId);
+    } else if (data.success) {
+      tbody.innerHTML = '';
+      noAppsMsg.innerText = 'No applicants yet.';
+      noAppsMsg.classList.remove('hidden');
     } else {
       tbody.innerHTML = '';
+      noAppsMsg.innerText = `Error: ${data.message || JSON.stringify(data)}`;
       noAppsMsg.classList.remove('hidden');
+      console.error('[Applicants] Server error:', data);
     }
   } catch (err) {
-    console.error('Error fetching applicants', err);
+    console.error('[Applicants] Network error:', err);
     tbody.innerHTML = '';
+    noAppsMsg.innerText = 'Network error loading applicants.';
+    noAppsMsg.classList.remove('hidden');
   }
 }
 
 function renderApplicants(apps, jobId) {
   const tbody = document.getElementById('applicantsBody');
-  const statuses = ['Applied', 'Interviewing', 'Offered', 'Rejected'];
+  const statuses = ['pending', 'Applied', 'Under Review', 'Interviewing', 'Offered', 'Approved', 'Rejected'];
   
   tbody.innerHTML = apps.map(app => {
     
     const options = statuses.map(s => {
-      const selected = app.status === s ? 'selected' : '';
+      const selected = app.application_status === s ? 'selected' : '';
       return `<option value="${s}" ${selected}>${s}</option>`;
     }).join('');
     
@@ -114,10 +124,10 @@ function renderApplicants(apps, jobId) {
         <td style="font-weight: 500;">${app.full_name}</td>
         <td>${app.email}</td>
         <td>
-          <span class="badge ${getStatusBadgeClass(app.status)}">${app.status}</span>
+          <span class="badge ${getStatusBadgeClass(app.application_status)}">${app.application_status}</span>
         </td>
         <td>
-          <select class="status-select" onchange="updateStatus(${app.application_id}, this.value, ${jobId})">
+          <select class="status-select" onchange="updateStatus('${app.application_id}', this.value, '${jobId}')">
             ${options}
           </select>
         </td>
@@ -128,16 +138,18 @@ function renderApplicants(apps, jobId) {
 
 function getStatusBadgeClass(status) {
   if (status === 'Interviewing') return 'badge-entry';
-  if (status === 'Offered') return 'badge-ft';
-  if (status === 'Rejected') return '';
-  return 'badge-remote'; // Applied
+  if (status === 'Offered')      return 'badge-ft';
+  if (status === 'Approved')     return 'badge-ft';
+  if (status === 'Rejected')     return '';
+  if (status === 'Under Review') return 'badge-remote';
+  return 'badge-remote'; // pending / Applied
 }
 
 async function updateStatus(appId, newStatus, jobId) {
   try {
     const response = await apiFetch(`/applications/${appId}/status`, {
       method: 'PATCH',
-      body: JSON.stringify({ status: newStatus })
+      body: JSON.stringify({ application_status: newStatus })
     });
     
     if (response && response.ok) {
